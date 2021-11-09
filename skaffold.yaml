@@ -1,0 +1,39 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+build:
+  local:
+    push: false
+  artifacts:
+    - image: oliverrw93/multi-client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "src/**/*.js"
+            dest: .
+          - src: "src/**/*.css"
+            dest: .
+          - src: "src/**/*.html"
+            dest: .
+    - image: oliverrw93/multi-worker
+      context: worker
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "*.js"
+            dest: .
+    - image: oliverrw93/multi-server
+      context: server
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "*.js"
+            dest: .
+deploy:
+  kubectl:
+    manifests:
+      - ./k8s/*.yaml
+      - ./k8s/dev/*.yaml
